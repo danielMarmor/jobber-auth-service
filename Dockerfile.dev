@@ -1,0 +1,17 @@
+FROM node:21-alpine3.18
+
+WORKDIR  /app
+COPY package.json ./
+COPY tsconfig.json ./
+COPY .npmrc ./ 
+COPY src ./src
+COPY tools ./tools
+
+RUN npm cache clean --force
+RUN npm --version
+RUN ls -a && cat .npmrc && npm config list
+RUN npm install && npm install -g nodemon
+
+EXPOSE 4002
+
+CMD [ "npm", "run", "dev" ]
