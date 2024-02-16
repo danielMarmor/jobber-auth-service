@@ -7,7 +7,7 @@ import helmet from "helmet";
 import cors from "cors";
 import { verify } from "jsonwebtoken";
 import compression from "compression";
-import { checkConnection } from "@auth/elasticsearch";
+import { checkConnection, createIndex } from "@auth/elasticsearch";
 import http from 'http'
 import { appRoutes } from "@auth/routes";
 import { Channel } from "amqplib";
@@ -17,7 +17,7 @@ const SERVICE_PORT = 4002;
 
 const logger: Logger = winstonLogger(config.ELASTIC_SEARCH_URL!, "auth server", "debug");
 
-export let authChannel : Channel | undefined;
+export let authChannel: Channel | undefined;
 
 export const start = async (app: Application): Promise<void> => {
     securityMiddleware(app);
@@ -60,12 +60,13 @@ const routesMiddlewear = (app: Application): void => {
     appRoutes(app);
 }
 
-const startQueues = async(): Promise<void> => {
+const startQueues = async (): Promise<void> => {
     authChannel = await createConnection();
 }
 
 const startElasticSearch = () => {
     checkConnection();
+    createIndex('gigs');
 }
 
 const authErrorMeddleware = ((app: Application) => {
